@@ -17,9 +17,11 @@ func encodeToAtt(v reflect.Value) (*dynamodb.AttributeValue, error) {
 		fmt.Printf("now d\n")
 		s := v.String()
 		if len(s) == 0 {
+			fmt.Printf("now e\n")
 			b := true
 			return &dynamodb.AttributeValue{NULL: &b}, nil
 		} else {
+			fmt.Printf("now f\n")
 			return &dynamodb.AttributeValue{S: &s}, nil
 		}
 
@@ -45,9 +47,8 @@ func encodeToAtt(v reflect.Value) (*dynamodb.AttributeValue, error) {
 			b := true
 			return &dynamodb.AttributeValue{NULL: &b}, nil
 		} else {
-			var m map[string]*dynamodb.AttributeValue
-			var err error
-			if m, err = encodeStruct(v); err != nil {
+			m, err := encodeStruct(v)
+			if err == nil {
 				return &dynamodb.AttributeValue{M: m}, nil
 			} else {
 				return nil, err
@@ -68,11 +69,12 @@ func encodeStruct(v reflect.Value) (map[string]*dynamodb.AttributeValue, error) 
 		typeInfo := val.Type()
 		fileName := typeInfo.Field(i).Name
 		fmt.Printf("field name: %s\n", fileName)
-		var att *dynamodb.AttributeValue
-		var err error
-		if att, err = encodeToAtt(val.Field(i)); err != nil {
+		att, err := encodeToAtt(val.Field(i))
+		if err == nil {
 			out[fileName] = att
+			fmt.Printf("now g\n")
 		} else {
+			fmt.Printf("now h%s\n", err)
 			return nil, err
 		}
 	}

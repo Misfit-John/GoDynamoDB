@@ -1,6 +1,6 @@
 package main
 
-import "./src"
+import GoDynamoDB "github.com/Misfit-John/GoDynamoDB/src"
 import "os"
 import "io/ioutil"
 

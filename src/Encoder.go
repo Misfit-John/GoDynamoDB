@@ -42,7 +42,7 @@ func encodeToAtt(v reflect.Value) (*dynamodb.AttributeValue, error) {
 	case reflect.Float32, reflect.Float64:
 		f := v.Float()
 		if math.IsInf(f, 0) || math.IsNaN(f) {
-			panic(fmt.Errorf("aws.dynamodb.convertToNumericString: NaN and infinite floats not supported"))
+			return nil, NewDynError("aws.dynamodb.convertToNumericString: NaN and infinite floats not supported")
 		}
 		fs := strconv.FormatFloat(f, 'g', -1, v.Type().Bits())
 		return &dynamodb.AttributeValue{N: aws.String(fs)}, nil
@@ -122,7 +122,7 @@ func encodeToAtt(v reflect.Value) (*dynamodb.AttributeValue, error) {
 	default:
 		return nil, NewDynError("unknow datatype, please contect author")
 	}
-	return nil, nil
+	return nil, NewDynError("unknow error")
 }
 
 func encodeStruct(v reflect.Value) (map[string]*dynamodb.AttributeValue, error) {

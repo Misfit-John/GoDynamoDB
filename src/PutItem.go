@@ -12,13 +12,13 @@ func PutItem(i ModelBase) error {
 			Endpoint: aws.String("http://127.0.0.1:8000")}))
 
 	attMap, err := encode(i)
-	if nil == err {
+	if nil != err {
 		return err
 	}
 	params := &dynamodb.PutItemInput{
 		Item:         attMap,
 		TableName:    aws.String(i.GetTableName()),
-		ReturnValues: aws.String("ReturnValue"),
+		ReturnValues: aws.String("NONE"),
 	}
 	resp, err := db.PutItem(params)
 

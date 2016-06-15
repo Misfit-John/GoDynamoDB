@@ -51,7 +51,7 @@ func TestDynamoPutAPI(t *testing.T) {
 			// More values...
 		},
 		TableName:    aws.String("Test"), // Required
-		ReturnValues: aws.String("ReturnValue"),
+		ReturnValues: aws.String("NONE"),
 	}
 	resp, err := db.PutItem(params)
 

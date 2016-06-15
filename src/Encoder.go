@@ -1,6 +1,7 @@
 package GoDynamoDB
 
 import "github.com/aws/aws-sdk-go/service/dynamodb"
+import "github.com/aws/aws-sdk-go/aws"
 import (
 	"fmt"
 	"math"
@@ -12,17 +13,14 @@ func encodeToAtt(v reflect.Value) (*dynamodb.AttributeValue, error) {
 	switch v.Kind() {
 	case reflect.Bool:
 		b := v.Bool()
-		return &dynamodb.AttributeValue{BOOL: &b}, nil
+		return &dynamodb.AttributeValue{BOOL: aws.Bool(b)}, nil
 	case reflect.String:
-		fmt.Printf("now d\n")
 		s := v.String()
 		if len(s) == 0 {
-			fmt.Printf("now e\n")
 			b := true
 			return &dynamodb.AttributeValue{NULL: &b}, nil
 		} else {
-			fmt.Printf("now f\n")
-			return &dynamodb.AttributeValue{S: &s}, nil
+			return &dynamodb.AttributeValue{S: aws.String(s)}, nil
 		}
 
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
@@ -42,7 +40,6 @@ func encodeToAtt(v reflect.Value) (*dynamodb.AttributeValue, error) {
 		return &dynamodb.AttributeValue{N: &fs}, nil
 
 	case reflect.Struct:
-		fmt.Printf("now c\n")
 		if v.IsNil() {
 			b := true
 			return &dynamodb.AttributeValue{NULL: &b}, nil
@@ -57,12 +54,10 @@ func encodeToAtt(v reflect.Value) (*dynamodb.AttributeValue, error) {
 	default:
 		return nil, nil
 	}
-	fmt.Printf("now b\n")
 	return nil, nil
 }
 
 func encodeStruct(v reflect.Value) (map[string]*dynamodb.AttributeValue, error) {
-	fmt.Printf("now a\n")
 	out := map[string]*dynamodb.AttributeValue{}
 	val := v.Elem()
 	for i := 0; i < val.NumField(); i++ {
@@ -72,9 +67,7 @@ func encodeStruct(v reflect.Value) (map[string]*dynamodb.AttributeValue, error) 
 		att, err := encodeToAtt(val.Field(i))
 		if err == nil {
 			out[fileName] = att
-			fmt.Printf("now g\n")
 		} else {
-			fmt.Printf("now h%s\n", err)
 			return nil, err
 		}
 	}

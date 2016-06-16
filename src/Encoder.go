@@ -3,7 +3,6 @@ package GoDynamoDB
 import "github.com/aws/aws-sdk-go/service/dynamodb"
 import "github.com/aws/aws-sdk-go/aws"
 import (
-	"fmt"
 	"math"
 	"reflect"
 	"strconv"
@@ -127,14 +126,17 @@ func encodeToAtt(v reflect.Value) (*dynamodb.AttributeValue, error) {
 
 func encodeStruct(v reflect.Value) (map[string]*dynamodb.AttributeValue, error) {
 	out := map[string]*dynamodb.AttributeValue{}
-	val := v.Elem()
-	for i := 0; i < val.NumField(); i++ {
-		typeInfo := val.Type()
-		fileName := typeInfo.Field(i).Name
-		fmt.Printf("field name: %s\n", fileName)
-		att, err := encodeToAtt(val.Field(i))
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	cache, err := GetCache(v.Type())
+	if err != nil {
+		return nil, err
+	}
+	for k, index := range cache.fieldIndex {
+		att, err := encodeToAtt(v.Field(index))
 		if err == nil {
-			out[fileName] = att
+			out[k] = att
 		} else {
 			return nil, err
 		}

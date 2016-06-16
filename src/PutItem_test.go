@@ -10,10 +10,16 @@ func (*TestStruct) GetTableName() string {
 }
 
 func Test_PutItem(t *testing.T) {
-	err := PutItem(&TestStruct{name: "John", id: "123"})
+	err := GetDBInstance().PutItem(&TestStruct{name: "John", id: "123"})
 	if err != nil {
-		fmt.Printf("error:%s\n", err)
-	} else {
-		fmt.Printf("success\n")
+		t.Error("can not put item")
 	}
+}
+
+func Test_Error(t *testing.T) {
+	t.Error("error!")
+}
+
+func init() {
+	InitLocalDBInstance("http://127.0.0.1:8000")
 }

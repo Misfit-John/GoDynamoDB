@@ -199,10 +199,8 @@ func decodeStruct(attrs map[string]*dynamodb.AttributeValue, v reflect.Value) er
 		return err
 	}
 	for k, attr := range attrs {
-		fmt.Printf("k is: %s\n", k)
 		if index, ok := fields.fieldIndex[k]; ok {
 			fv := v.Field(index)
-			fmt.Printf("index is: %d, and kind is:%s \n", index, fv.Kind())
 			if err := decodeAttribute(attr, fv); err != nil {
 				return err
 			}

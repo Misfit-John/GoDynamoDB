@@ -1,7 +1,6 @@
 package GoDynamoDB
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -10,7 +9,7 @@ func (*TestStruct) GetTableName() string {
 }
 
 func Test_PutItem(t *testing.T) {
-	err := GetDBInstance().PutItem(&TestStruct{name: "John", id: "123"})
+	err := GetDBInstance().PutItem(&TestStruct{Name: "John", Id: "123"})
 	if err != nil {
 		t.Error("can not put item")
 	}

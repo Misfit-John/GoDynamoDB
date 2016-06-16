@@ -6,12 +6,7 @@ import (
 	"testing"
 )
 
-type TestStruct struct {
-	Name string
-	Id   string
-}
-
-func Test_encode(t *testing.T) {
+func Test_decode(t *testing.T) {
 	var attMap map[string]*dynamodb.AttributeValue
 	var err error
 	attMap, err = encode(&TestStruct{Name: "John", Id: "123"})
@@ -33,5 +28,19 @@ func Test_encode(t *testing.T) {
 		if *v.S != "123" {
 			t.Errorf("wrong Id:", v.S)
 		}
+	}
+
+	outStruct := TestStruct{Name: "test", Id: "ddd"}
+	decodeErr := decode(attMap, &outStruct)
+	if nil != decodeErr {
+		t.Error("can't decode")
+	}
+
+	if outStruct.Name != "John" {
+		t.Error("wrong Name")
+	}
+
+	if outStruct.Id != "123" {
+		t.Error("wrong Id")
 	}
 }

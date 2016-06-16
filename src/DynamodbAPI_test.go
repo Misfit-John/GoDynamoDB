@@ -1,7 +1,6 @@
 package GoDynamoDB
 
 import "testing"
-import "fmt"
 import "github.com/aws/aws-sdk-go/service/dynamodb"
 import "github.com/aws/aws-sdk-go/aws/session"
 import "github.com/aws/aws-sdk-go/aws"
@@ -25,7 +24,7 @@ func TestDynamoScanAPI(t *testing.T) {
 	if err != nil {
 		// Print the error, cast err to awserr.Error to get the Code and
 		// Message from an error.
-		t.Error(err.Error())
+		t.Error(resp.String())
 	}
 }
 
@@ -54,7 +53,7 @@ func TestDynamoPutAPI(t *testing.T) {
 	if err != nil {
 		// Print the error, cast err to awserr.Error to get the Code and
 		// Message from an error.
-		t.Error(err.Error())
+		t.Error(resp.String())
 	}
 
 }

@@ -1,5 +1,10 @@
 package GoDynamoDB
 
-type ModelBase interface {
+type WriteModel interface {
 	GetTableName() string
+}
+
+type ReadModel interface {
+	GetTableName() string
+	IsConsistentRead() bool
 }

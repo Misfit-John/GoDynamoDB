@@ -2,9 +2,8 @@ package GoDynamoDB
 
 import "github.com/aws/aws-sdk-go/service/dynamodb"
 import "github.com/aws/aws-sdk-go/aws"
-import "fmt"
 
-func (db GoDynamoDB) PutItem(i ModelBase) error {
+func (db GoDynamoDB) PutItem(i WriteModel) error {
 	attMap, err := encode(i)
 	if nil != err {
 		return err
@@ -17,7 +16,7 @@ func (db GoDynamoDB) PutItem(i ModelBase) error {
 	resp, err := db.db.PutItem(params)
 
 	if err != nil {
-		return err
+		return NewDynError(resp.String())
 	}
 
 	return nil

@@ -1,6 +1,9 @@
 package GoDynamoDB
 
-import "reflect"
+import (
+	"fmt"
+	"reflect"
+)
 
 type KeyPair struct {
 	pkey, rkey string //p for partition, r for range
@@ -36,12 +39,48 @@ func GetCache(t reflect.Type) (*FieldCache, error) {
 
 func initCache(t reflect.Type) (*FieldCache, error) {
 	out := FieldCache{
-		fieldIndex: make(map[string]int),
+		fieldIndex:   make(map[string]int),
+		fieldNameMap: make(map[string]string),
+		key:          make(map[string]KeyPair),
 	}
 	tNmae := t.Name()
+
 	for i := 0; i < t.NumField(); i++ {
 		fieldI := t.Field(i)
 		out.fieldIndex[fieldI.Name] = i
+		tags := fieldI.Tag
+		nameTag := tags.Get("DAlias")
+		if "" != nameTag {
+			out.fieldNameMap[fieldI.Name] = nameTag
+			//should also add the alias' into the index map
+			out.fieldIndex[nameTag] = i
+		}
+		keyTag := tags.Get("DPKey")
+		if "" != keyTag {
+			if pair, ok := out.key[keyTag]; ok {
+				if pair.pkey != "" {
+					return nil, NewDynError(fmt.Sprintf("double defined partition key:", fieldI.Name))
+				} else {
+					pair.pkey = fieldI.Name
+				}
+			} else {
+				out.key[keyTag] = KeyPair{pkey: fieldI.Name}
+			}
+		}
+
+		rangeTag := tags.Get("DRKey")
+		if "" != keyTag {
+			if pair, ok := out.key[rangeTag]; ok {
+				if pair.rkey != "" {
+					return nil, NewDynError(fmt.Sprintf("double defined range key:", fieldI.Name))
+				} else {
+					pair.pkey = fieldI.Name
+				}
+			} else {
+				out.key[rangeTag] = KeyPair{rkey: fieldI.Name}
+			}
+		}
+
 	}
 
 	if nil == fieldCache {

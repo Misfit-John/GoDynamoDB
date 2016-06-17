@@ -5,7 +5,7 @@ import "github.com/aws/aws-sdk-go/aws"
 
 func (db GoDynamoDB) GetItem(i ReadModel) error {
 	//actually we need a func called encode key
-	key, err := encode(i)
+	key, err := encodeKeyOnly(i, i.GetTableName())
 	if err != nil {
 		return err
 	}
@@ -17,8 +17,9 @@ func (db GoDynamoDB) GetItem(i ReadModel) error {
 	resp, err := db.db.GetItem(params)
 
 	if err != nil {
-		return NewDynError(resp.String())
+		return NewDynError(err.Error())
 	}
+	decode(resp.Item, i)
 
 	return nil
 }

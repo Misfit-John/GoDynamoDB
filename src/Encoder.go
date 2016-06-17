@@ -136,7 +136,62 @@ func encodeStruct(v reflect.Value) (map[string]*dynamodb.AttributeValue, error) 
 	for k, index := range cache.fieldIndex {
 		att, err := encodeToAtt(v.Field(index))
 		if err == nil {
-			out[k] = att
+			if mapName, ok := cache.fieldNameMap[k]; ok {
+				//use DAlias name if this tag exist
+				out[mapName] = att
+			} else {
+				//use original name if no tag exist
+				out[k] = att
+			}
+		} else {
+			return nil, err
+		}
+	}
+	return out, nil
+}
+
+func encodeKeyOnly(i interface{}, name string) (map[string]*dynamodb.AttributeValue, error) {
+	v := reflect.ValueOf(i)
+	//copy from encodeStruct
+	out := map[string]*dynamodb.AttributeValue{}
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	cache, err := GetCache(v.Type())
+	if err != nil {
+		return nil, err
+	}
+
+	keyPair, ok := cache.key[name]
+	if !ok {
+		return nil, NewDynError("no key pair is defined for table/index name")
+	}
+
+	if index, ok := cache.fieldIndex[keyPair.pkey]; ok {
+		att, err := encodeToAtt(v.Field(index))
+		if err == nil {
+			if mapName, ok := cache.fieldNameMap[keyPair.pkey]; ok {
+				//use DAlias name if this tag exist
+				out[mapName] = att
+			} else {
+				//use original name if no tag exist
+				out[keyPair.pkey] = att
+			}
+		} else {
+			return nil, err
+		}
+	}
+
+	if index, ok := cache.fieldIndex[keyPair.rkey]; ok {
+		att, err := encodeToAtt(v.Field(index))
+		if err == nil {
+			if mapName, ok := cache.fieldNameMap[keyPair.rkey]; ok {
+				//use DAlias name if this tag exist
+				out[mapName] = att
+			} else {
+				//use original name if no tag exist
+				out[keyPair.rkey] = att
+			}
 		} else {
 			return nil, err
 		}

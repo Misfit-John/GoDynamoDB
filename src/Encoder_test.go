@@ -6,11 +6,6 @@ import (
 	"testing"
 )
 
-type TestStruct struct {
-	Name string
-	Id   string
-}
-
 func Test_encode(t *testing.T) {
 	var attMap map[string]*dynamodb.AttributeValue
 	var err error
@@ -27,8 +22,8 @@ func Test_encode(t *testing.T) {
 		}
 	}
 
-	if v, ok := attMap["Id"]; ok == false {
-		t.Error("no Id att")
+	if v, ok := attMap["id"]; ok == false {
+		t.Error("no id att")
 	} else {
 		if *v.S != "123" {
 			t.Errorf("wrong Id:", v.S)

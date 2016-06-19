@@ -9,6 +9,12 @@ func (*TestStruct) GetTableName() string {
 	return "Test"
 }
 
-func (*TestStruct) IsConsistentRead() bool {
-	return false
+type TestStruct2nd struct {
+	Name   string
+	School string
+	Id     string `DAlias:"id" DPKey:"Test"`
+}
+
+func (*TestStruct2nd) GetTableName() string {
+	return "Test"
 }

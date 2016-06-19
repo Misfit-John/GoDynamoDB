@@ -6,5 +6,4 @@ type WriteModel interface {
 
 type ReadModel interface {
 	GetTableName() string
-	IsConsistentRead() bool
 }

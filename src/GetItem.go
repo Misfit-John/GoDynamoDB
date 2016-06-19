@@ -2,6 +2,7 @@ package GoDynamoDB
 
 import "github.com/aws/aws-sdk-go/service/dynamodb"
 import "github.com/aws/aws-sdk-go/aws"
+import "time"
 
 type GetItemExecutor struct {
 	input *dynamodb.GetItemInput
@@ -35,15 +36,24 @@ func (e *GetItemExecutor) Exec() error {
 }
 
 type BatchGetItemExecutor struct {
-	input *dynamodb.BatchGetItemInput
-	db    *dynamodb.DynamoDB
-	ret   *[]ReadModel
+	input        *dynamodb.BatchGetItemInput
+	db           *dynamodb.DynamoDB
+	ret          *[]ReadModel
+	modelSiteMap map[string][]int
+	curIt        map[string]int
 }
 
 func (db GoDynamoDB) GetBatchGetItemExecutor(is []ReadModel) (*BatchGetItemExecutor, error) {
 	out := &dynamodb.BatchGetItemInput{
 		RequestItems: make(map[string]*dynamodb.KeysAndAttributes),
 	}
+	ret := &BatchGetItemExecutor{
+		db:           db.db,
+		ret:          &is,
+		modelSiteMap: make(map[string][]int),
+		curIt:        make(map[string]int),
+	}
+
 	isLen := len(is)
 	for i := 0; i < isLen; i++ {
 		tableName := is[i].GetTableName()
@@ -54,9 +64,42 @@ func (db GoDynamoDB) GetBatchGetItemExecutor(is []ReadModel) (*BatchGetItemExecu
 
 		if _, ok := out.RequestItems[tableName]; !ok {
 			out.RequestItems[tableName] = &dynamodb.KeysAndAttributes{}
+			ret.modelSiteMap[tableName] = make([]int, 0)
+			ret.curIt[tableName] = 0
 		}
 		out.RequestItems[tableName].Keys = append(out.RequestItems[tableName].Keys, key)
+		ret.modelSiteMap[tableName] = append(ret.modelSiteMap[tableName], i)
 	}
 
-	return &BatchGetItemExecutor{input: out, db: db.db, ret: &is}, nil
+	ret.input = out
+
+	return ret, nil
+}
+
+func (e *BatchGetItemExecutor) Exec() error {
+	rsp, err := e.db.BatchGetItem(e.input)
+
+	if err != nil {
+		return err
+	}
+
+	for key, value := range rsp.Responses {
+		curItInTable := e.curIt[key]
+
+		for i := 0; i < len(value); i++ {
+			itInRet := e.modelSiteMap[key][curItInTable]
+			decode(value[i], &(*e.ret)[itInRet])
+			curItInTable++
+		}
+		e.curIt[key] = curItInTable
+	}
+
+	if len(rsp.UnprocessedKeys) != 0 {
+		// this is a big feature that needs to test
+		e.input.RequestItems = rsp.UnprocessedKeys
+		time.Sleep(100 * time.Millisecond)
+		return e.Exec()
+	}
+
+	return nil
 }

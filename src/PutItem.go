@@ -23,7 +23,7 @@ func (db GoDynamoDB) GetPutItemExcutor(i WriteModel) (*PutItemExecutor, error) {
 	return &PutItemExecutor{input: params, db: db.db}, nil
 }
 
-func (e PutItemExecutor) exec() error {
+func (e *PutItemExecutor) Exec() error {
 	resp, err := e.db.PutItem(e.input)
 
 	if err != nil {

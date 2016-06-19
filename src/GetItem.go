@@ -23,7 +23,7 @@ func (db GoDynamoDB) GetGetItemExecutor(i ReadModel) (*GetItemExecutor, error) {
 	return &GetItemExecutor{input: params, db: db.db, ret: &i}, nil
 }
 
-func (e GetItemExecutor) Exec() error {
+func (e *GetItemExecutor) Exec() error {
 	resp, err := e.db.GetItem(e.input)
 
 	if err != nil {
@@ -32,6 +32,12 @@ func (e GetItemExecutor) Exec() error {
 	decode(resp.Item, e.ret)
 	return nil
 
+}
+
+type BathGetItemExecutor struct {
+	input *dynamodb.GetItemInput
+	db    *dynamodb.DynamoDB
+	ret   *ReadModel
 }
 
 func (db GoDynamoDB) BathGetItem(is []ReadModel) error {

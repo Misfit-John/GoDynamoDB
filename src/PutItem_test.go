@@ -9,7 +9,7 @@ func Test_PutItem(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	execErr := e.exec()
+	execErr := e.Exec()
 	if execErr != nil {
 		t.Error(execErr.Error())
 	}

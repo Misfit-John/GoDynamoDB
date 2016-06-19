@@ -34,13 +34,29 @@ func (e *GetItemExecutor) Exec() error {
 
 }
 
-type BathGetItemExecutor struct {
-	input *dynamodb.GetItemInput
+type BatchGetItemExecutor struct {
+	input *dynamodb.BatchGetItemInput
 	db    *dynamodb.DynamoDB
-	ret   *ReadModel
+	ret   *[]ReadModel
 }
 
-func (db GoDynamoDB) BathGetItem(is []ReadModel) error {
-	return nil
+func (db GoDynamoDB) GetBatchGetItemExecutor(is []ReadModel) (*BatchGetItemExecutor, error) {
+	out := &dynamodb.BatchGetItemInput{
+		RequestItems: make(map[string]*dynamodb.KeysAndAttributes),
+	}
+	isLen := len(is)
+	for i := 0; i < isLen; i++ {
+		tableName := is[i].GetTableName()
+		key, err := encodeKeyOnly(is[i], tableName)
+		if err != nil {
+			return nil, err
+		}
 
+		if _, ok := out.RequestItems[tableName]; !ok {
+			out.RequestItems[tableName] = &dynamodb.KeysAndAttributes{}
+		}
+		out.RequestItems[tableName].Keys = append(out.RequestItems[tableName].Keys, key)
+	}
+
+	return &BatchGetItemExecutor{input: out, db: db.db, ret: &is}, nil
 }

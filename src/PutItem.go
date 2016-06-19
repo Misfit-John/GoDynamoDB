@@ -6,7 +6,7 @@ import "github.com/aws/aws-sdk-go/aws"
 type PutItemExecutor struct {
 	input *dynamodb.PutItemInput
 	db    *dynamodb.DynamoDB
-	res   WriteModel
+	res   *WriteModel
 }
 
 func (db GoDynamoDB) GetPutItemExcutor(i WriteModel) (*PutItemExecutor, error) {

@@ -3,23 +3,38 @@ package GoDynamoDB
 import "github.com/aws/aws-sdk-go/service/dynamodb"
 import "github.com/aws/aws-sdk-go/aws"
 
-func (db GoDynamoDB) GetItem(i ReadModel) error {
+type GetItemExecutor struct {
+	input *dynamodb.GetItemInput
+	db    *dynamodb.DynamoDB
+	ret   *ReadModel
+}
+
+func (db GoDynamoDB) GetGetItemExecutor(i ReadModel) (*GetItemExecutor, error) {
 	//actually we need a func called encode key
 	key, err := encodeKeyOnly(i, i.GetTableName())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	params := &dynamodb.GetItemInput{
-		TableName:      aws.String(i.GetTableName()),
-		ConsistentRead: aws.Bool(i.IsConsistentRead()),
-		Key:            key,
+		TableName: aws.String(i.GetTableName()),
+		Key:       key,
 	}
-	resp, err := db.db.GetItem(params)
+
+	return &GetItemExecutor{input: params, db: db.db, ret: &i}, nil
+}
+
+func (e GetItemExecutor) Exec() error {
+	resp, err := e.db.GetItem(e.input)
 
 	if err != nil {
-		return NewDynError(err.Error())
+		return NewDynError(resp.String())
 	}
-	decode(resp.Item, i)
-
+	decode(resp.Item, e.ret)
 	return nil
+
+}
+
+func (db GoDynamoDB) BathGetItem(is []ReadModel) error {
+	return nil
+
 }

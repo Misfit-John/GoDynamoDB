@@ -129,7 +129,7 @@ func encodeStruct(v reflect.Value) (map[string]*dynamodb.AttributeValue, error) 
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
-	cache, err := GetCache(v.Type())
+	cache, err := getCache(v.Type())
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func encodeKeyOnly(i interface{}, name string) (map[string]*dynamodb.AttributeVa
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
-	cache, err := GetCache(v.Type())
+	cache, err := getCache(v.Type())
 	if err != nil {
 		return nil, err
 	}

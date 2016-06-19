@@ -194,7 +194,7 @@ func decodeStruct(attrs map[string]*dynamodb.AttributeValue, v reflect.Value) er
 	for v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
-	fields, err := GetCache(v.Type())
+	fields, err := getCache(v.Type())
 	if err != nil {
 		return err
 	}

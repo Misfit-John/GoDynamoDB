@@ -5,9 +5,13 @@ import (
 )
 
 func Test_PutItem(t *testing.T) {
-	err := GetDBInstance().PutItem(&TestStruct{Name: "John", Id: "123"})
+	e, err := GetDBInstance().GetPutItemExcutor(&TestStruct{Name: "John", Id: "123"})
 	if err != nil {
 		t.Error(err.Error())
+	}
+	execErr := e.exec()
+	if execErr != nil {
+		t.Error(execErr.Error())
 	}
 }
 

@@ -10,17 +10,16 @@ type KeyPair struct {
 }
 
 type FieldCache struct {
-	name          string
-	fieldIndex    map[string]int     //map from name to index
-	expressionMap map[string]string  //expressiono map
-	key           map[string]KeyPair //key map, key is table/index name, value will be (partition key, range key)
-	nilAct        map[string]string  //should be one of ignore, setNull, panic
-	fieldNameMap  map[string]string  //key is original field name in struct, value is name in dynamodb.
+	name         string
+	fieldIndex   map[string]int     //map from name to index
+	key          map[string]KeyPair //key map, key is table/index name, value will be (partition key, range key)
+	nilAct       map[string]string  //should be one of ignore, setNull, panic
+	fieldNameMap map[string]string  //key is original field name in struct, value is name in dynamodb.
 }
 
 var fieldCache map[string]*FieldCache
 
-func GetCache(t reflect.Type) (*FieldCache, error) {
+func getCache(t reflect.Type) (*FieldCache, error) {
 	if nil == fieldCache {
 		fieldCache = make(map[string]*FieldCache)
 	}

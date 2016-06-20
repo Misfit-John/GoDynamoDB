@@ -8,6 +8,18 @@ import (
 	"strconv"
 )
 
+func encodeToQueryAtt(i interface{}) (*dynamodb.AttributeValue, error) {
+	v := reflect.ValueOf(i)
+	switch v.Kind() {
+	// query atti should not return in these types
+	case reflect.Struct, reflect.Ptr, reflect.Slice, reflect.Map, reflect.Array:
+		return nil, NewDynError("unknow type")
+	}
+
+	return encodeToAtt(v)
+
+}
+
 func encodeToAtt(v reflect.Value) (*dynamodb.AttributeValue, error) {
 	for v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
 		if v.IsNil() {

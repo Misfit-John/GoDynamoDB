@@ -17,6 +17,6 @@ Some of the encoder and decoder codes is copied from github.com/justonia/dynamod
 - DPKey and DRKey should use the table/index's name
 - table name can't be same as index name
 - Will sleep 100ms or more if the request for BatchGetItem is too large to return in one time.
-
+- Don't allow duplicate keys in batch get request because the limit of AWS SDK
 
 

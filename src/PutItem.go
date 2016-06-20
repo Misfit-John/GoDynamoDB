@@ -6,7 +6,8 @@ import "github.com/aws/aws-sdk-go/aws"
 type PutItemExecutor struct {
 	input *dynamodb.PutItemInput
 	db    *dynamodb.DynamoDB
-	res   *WriteModel
+	// I don't sure if we are going to need this, so just keep it
+	//	res   *WriteModel
 }
 
 func (db GoDynamoDB) GetPutItemExcutor(i WriteModel) (*PutItemExecutor, error) {
@@ -31,4 +32,59 @@ func (e *PutItemExecutor) Exec() error {
 	}
 	return nil
 
+}
+
+type BatchWriteItemExecutor struct {
+	input *dynamodb.BatchWriteItemInput
+	db    *dynamodb.DynamoDB
+}
+
+func (db GoDynamoDB) GetBatchWriteItemExecutor(toPut, toDelete []WriteModel) (*BatchWriteItemExecutor, error) {
+	input := &dynamodb.BatchWriteItemInput{
+		RequestItems:                make(map[string][]*dynamodb.WriteRequest),
+		ReturnItemCollectionMetrics: aws.String("NONE"),
+	}
+	ret := &BatchWriteItemExecutor{db: db.db}
+
+	// append put request
+	if len(toPut) > 0 {
+		for i := 0; i < len(toPut); i++ {
+			tableName := toPut[i].GetTableName()
+			if _, ok := input.RequestItems[tableName]; !ok {
+				input.RequestItems[tableName] = make([]*dynamodb.WriteRequest, 0)
+			}
+			attMap, err := encode(toPut[i])
+			if nil != err {
+				return nil, err
+			}
+			input.RequestItems[tableName] = append(input.RequestItems[tableName], &dynamodb.WriteRequest{
+				PutRequest: &dynamodb.PutRequest{
+					Item: attMap,
+				},
+			})
+		}
+	}
+
+	// append delete request
+	if len(toDelete) > 0 {
+		for i := 0; i < len(toDelete); i++ {
+			tableName := toDelete[i].GetTableName()
+			if _, ok := input.RequestItems[tableName]; !ok {
+				input.RequestItems[tableName] = make([]*dynamodb.WriteRequest, 0)
+			}
+			attMap, err := encodeKeyOnly(toDelete[i], tableName)
+			if nil != err {
+				return nil, err
+			}
+			input.RequestItems[tableName] = append(input.RequestItems[tableName], &dynamodb.WriteRequest{
+				DeleteRequest: &dynamodb.DeleteRequest{
+					Key: attMap,
+				},
+			})
+		}
+	}
+
+	ret.input = input
+
+	return ret, nil
 }

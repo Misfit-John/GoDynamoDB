@@ -15,6 +15,23 @@ func Test_PutItem(t *testing.T) {
 	}
 }
 
+func Test_BatchPutItem(t *testing.T) {
+	toPut := make([]WriteModel, 3)
+	toPut[0] = &TestStruct{Id: "12355", Name: "John123"}
+	toPut[1] = &TestStruct2nd{Id: "1234", Name: "2ndJohn", School: "UESTC"}
+	toPut[2] = &TestStruct{Id: "1235", Name: "1235John"}
+	e, err := GetDBInstance().GetBatchWriteItemExecutor(toPut, make([]WriteModel, 0))
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	execErr := e.Exec()
+	if nil != execErr {
+		t.Error(execErr.Error())
+	}
+
+}
+
 func init() {
 	InitLocalDBInstance("http://127.0.0.1:8000")
 }

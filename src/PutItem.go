@@ -2,6 +2,7 @@ package GoDynamoDB
 
 import "github.com/aws/aws-sdk-go/service/dynamodb"
 import "github.com/aws/aws-sdk-go/aws"
+import "time"
 
 type PutItemExecutor struct {
 	input *dynamodb.PutItemInput
@@ -87,4 +88,19 @@ func (db GoDynamoDB) GetBatchWriteItemExecutor(toPut, toDelete []WriteModel) (*B
 	ret.input = input
 
 	return ret, nil
+}
+
+func (e *BatchWriteItemExecutor) Exec() error {
+	rsp, err := e.db.BatchWriteItem(e.input)
+
+	if err != nil {
+		return err
+	}
+
+	if len(rsp.UnprocessedItems) != 0 {
+		e.input.RequestItems = rsp.UnprocessedItems
+		time.Sleep(100 * time.Millisecond)
+		return e.Exec()
+	}
+	return nil
 }

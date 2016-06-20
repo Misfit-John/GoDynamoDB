@@ -12,9 +12,9 @@ func (*TestStruct) GetTableName() string {
 type TestStruct2nd struct {
 	Name   string
 	School string
-	Id     string `DAlias:"id" DPKey:"Test"`
+	Id     string `DAlias:"id" DPKey:"test2nd"`
 }
 
 func (*TestStruct2nd) GetTableName() string {
-	return "Test"
+	return "test2nd"
 }

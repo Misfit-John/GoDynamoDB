@@ -39,4 +39,12 @@ func Test_BatchGetItem(t *testing.T) {
 	if toGet[0].(*TestStruct).Name != "John" {
 		t.Error("Get fail")
 	}
+
+	if toGet[1].(*TestStruct2nd).Name != "2ndJohn" {
+		t.Error("Get fail")
+	}
+
+	if toGet[1].(*TestStruct2nd).School != "UESTC" {
+		t.Error("Get fail")
+	}
 }

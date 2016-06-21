@@ -11,6 +11,17 @@ type QueryCondExpressHelper struct {
 	expressMap map[string]*string
 }
 
+const (
+	OperandConst  = 1
+	OperandTop    = 2
+	OperandNested = 3
+)
+
+type Operand struct {
+	value  interface{}
+	opType int
+}
+
 func NewQueryCondExpress() *QueryCondExpressHelper {
 	return &QueryCondExpressHelper{
 		str:      "",
@@ -18,128 +29,72 @@ func NewQueryCondExpress() *QueryCondExpressHelper {
 	}
 }
 
-func (q *QueryCondExpressHelper) AddExpressMap(org, exp string) *QueryCondExpressHelper {
-	if nil == q.expressMap {
-		q.expressMap = make(map[string]*string)
-	}
-	q.expressMap[exp] = aws.String(org)
-	return q
+func (q *QueryCondExpressHelper) Eq(l, r Operand) *QueryCondExpressHelper {
+
+}
+func (q *QueryCondExpressHelper) NE(l, r Operand) *QueryCondExpressHelper {
+
 }
 
-func (q *QueryCondExpressHelper) Eq(key string, value interface{}) *QueryCondExpressHelper {
-	att, err := encodeToQueryAtt(value)
-	if err != nil {
-		return nil
-	}
-	valueExp := fmt.Sprintf(":v_%s", q.removeSharp(key))
-	q.valueMap[valueExp] = att
-	if q.str != "" {
-		q.str = fmt.Sprintf("%s AND ", q.str)
-	}
-	q.str = fmt.Sprintf("%s%s = %s", q.str, key, valueExp)
+func (q *QueryCondExpressHelper) LT(l, r Operand) *QueryCondExpressHelper {
 
-	return q
 }
 
-func (q *QueryCondExpressHelper) LT(key string, value interface{}) *QueryCondExpressHelper {
-	att, err := encodeToQueryAtt(value)
-	if err != nil {
-		return nil
-	}
-	valueExp := fmt.Sprintf(":v_%s", q.removeSharp(key))
-	q.valueMap[valueExp] = att
-	if q.str != "" {
-		q.str = fmt.Sprintf("%s AND ", q.str)
-	}
-	q.str = fmt.Sprintf("%s%s < %s", q.str, key, valueExp)
-	return q
+func (q *QueryCondExpressHelper) LE(l, r Operand) *QueryCondExpressHelper {
+
 }
 
-func (q *QueryCondExpressHelper) GT(key string, value interface{}) *QueryCondExpressHelper {
-	att, err := encodeToQueryAtt(value)
-	if err != nil {
-		return nil
-	}
+func (q *QueryCondExpressHelper) GT(l, r Operand) *QueryCondExpressHelper {
 
-	valueExp := fmt.Sprintf(":v_%s", q.removeSharp(key))
-	q.valueMap[valueExp] = att
-	if q.str != "" {
-		q.str = fmt.Sprintf("%s AND ", q.str)
-	}
-	q.str = fmt.Sprintf("%s%s > %s", q.str, key, valueExp)
-
-	return q
 }
 
-func (q *QueryCondExpressHelper) GE(key string, value interface{}) *QueryCondExpressHelper {
-	att, err := encodeToQueryAtt(value)
-	if err != nil {
-		return nil
-	}
-	valueExp := fmt.Sprintf(":v_%s", q.removeSharp(key))
-	q.valueMap[valueExp] = att
-	if q.str != "" {
-		q.str = fmt.Sprintf("%s AND ", q.str)
-	}
-	q.str = fmt.Sprintf("%s%s >= %s", q.str, key, valueExp)
-	return q
+func (q *QueryCondExpressHelper) GE(l, r Operand) *QueryCondExpressHelper {
+
 }
 
-func (q *QueryCondExpressHelper) LE(key string, value interface{}) *QueryCondExpressHelper {
-	att, err := encodeToQueryAtt(value)
-	if err != nil {
-		return nil
-	}
-	valueExp := fmt.Sprintf(":v_%s", q.removeSharp(key))
-	q.valueMap[valueExp] = att
-	if q.str != "" {
-		q.str = fmt.Sprintf("%s AND ", q.str)
-	}
-	q.str = fmt.Sprintf("%s%s <= %s", q.str, key, valueExp)
+func (q *QueryCondExpressHelper) In(l, r ...Operand) *QueryCondExpressHelper {
 
-	return q
 }
 
-func (q *QueryCondExpressHelper) BeginWith(key string, value interface{}) *QueryCondExpressHelper {
-	att, err := encodeToQueryAtt(value)
-	if err != nil {
-		return nil
-	}
+func (q *QueryCondExpressHelper) Between(l, rl, rr Operand) *QueryCondExpressHelper {
 
-	valueExp := fmt.Sprintf(":v_%s", q.removeSharp(key))
-	q.valueMap[valueExp] = att
-	if q.str != "" {
-		q.str = fmt.Sprintf("%s AND ", q.str)
-	}
-	q.str = fmt.Sprintf("%sbegins_with (%s, %s)", q.str, key, valueExp)
-
-	return q
 }
 
-func (q *QueryCondExpressHelper) Between(key string, left, right interface{}) *QueryCondExpressHelper {
-	attLeft, errLeft := encodeToQueryAtt(left)
-	if errLeft != nil {
-		return nil
-	}
-	valueExpLeft := fmt.Sprintf(":v_l_%s", q.removeSharp(key))
-	q.valueMap[valueExpLeft] = attLeft
+func (q *QueryCondExpressHelper) Attribute_exist(path string) *QueryCondExpressHelper {
 
-	attRight, errRight := encodeToQueryAtt(right)
-	if errRight != nil {
-		return nil
-	}
-	valueExpRight := fmt.Sprintf(":v_r_%s", q.removeSharp(key))
-	q.valueMap[valueExpRight] = attRight
-
-	if q.str != "" {
-		q.str = fmt.Sprintf("%s AND ", q.str)
-	}
-
-	q.str = fmt.Sprintf("%s%s BETWEEN :%s AND :%s", q.str, key, valueExpLeft, valueExpRight)
-
-	return q
 }
 
+func (q *QueryCondExpressHelper) Attribute_not_exist(path string) *QueryCondExpressHelper {
+
+}
+
+func (q *QueryCondExpressHelper) Attribute_type(path, t string) *QueryCondExpressHelper {
+
+}
+
+func (q *QueryCondExpressHelper) Begins_with(path, prefix string) *QueryCondExpressHelper {
+
+}
+func (q *QueryCondExpressHelper) Conatins(path, str string) *QueryCondExpressHelper {
+
+}
+func (q *QueryCondExpressHelper) Size(path string) *QueryCondExpressHelper {
+
+}
+
+func (q *QueryCondExpressHelper) And(l, r *QueryCondExpressHelper) *QueryCondExpressHelper {
+
+}
+
+func (q *QueryCondExpressHelper) Or(l, r *QueryCondExpressHelper) *QueryCondExpressHelper {
+
+}
+func (q *QueryCondExpressHelper) Not(q *QueryCondExpressHelper) *QueryCondExpressHelper {
+
+}
+func (q *QueryCondExpressHelper) Wrap(l, r *QueryCondExpressHelper) *QueryCondExpressHelper {
+
+}
 func (q *QueryCondExpressHelper) removeSharp(key string) string {
 	return strings.Replace(key, "#", "", -1)
 }

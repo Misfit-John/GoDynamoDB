@@ -1,6 +1,20 @@
 # GoDynamoDB
 DynamoORM for go, just for fun because I don't know go now.
 
+## install
+This repo is maintained by `godep`, so you should just install `godep` by `go get github.com/tools/godep` , and than you can enjoy this repo:
+
+```shell
+go get github.com/Misfit-John/GoDynamodb
+cd $GOPATH/src/github.com/Misfit-John/GoDynamodb
+godep restore
+```
+
+And yes, I don't sure about this install process now because I haven't tried it yet👻
+
+#### dependency:
+Only `aws/aws-sdk-go` is necessary third party dependency, other packages are all official packages.
+
 ## supported tag
 **DAlias** the alia name of the field which will finally show in db.
 

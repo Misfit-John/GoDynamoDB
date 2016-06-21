@@ -5,8 +5,7 @@ import (
 )
 
 func Test_Query(t *testing.T) {
-	helper := NewQueryCondExpress().Eq("id", "123")
-	//	.GT("#a", 11).AddExpressMap("index", "#a")
+	helper := NewQueryCondExpress().Eq("id", "123").GT("#a", 11).AddExpressMap("index", "#a")
 	exec, createErr := GetDBInstance().GetQueryExecutor(&QueryTest{})
 	if createErr != nil {
 		t.Error(createErr.Error())

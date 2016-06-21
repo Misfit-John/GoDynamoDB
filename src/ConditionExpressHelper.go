@@ -2,6 +2,7 @@ package GoDynamoDB
 
 import "github.com/aws/aws-sdk-go/service/dynamodb"
 import "github.com/aws/aws-sdk-go/aws"
+import "strings"
 import "fmt"
 
 type QueryCondExpressHelper struct {
@@ -30,7 +31,7 @@ func (q *QueryCondExpressHelper) Eq(key string, value interface{}) *QueryCondExp
 	if err != nil {
 		return nil
 	}
-	valueExp := fmt.Sprintf(":v_%s", key)
+	valueExp := fmt.Sprintf(":v_%s", q.removeSharp(key))
 	q.valueMap[valueExp] = att
 	if q.str != "" {
 		q.str = fmt.Sprintf("%s AND ", q.str)
@@ -45,7 +46,7 @@ func (q *QueryCondExpressHelper) LT(key string, value interface{}) *QueryCondExp
 	if err != nil {
 		return nil
 	}
-	valueExp := fmt.Sprintf(":v_%s", key)
+	valueExp := fmt.Sprintf(":v_%s", q.removeSharp(key))
 	q.valueMap[valueExp] = att
 	if q.str != "" {
 		q.str = fmt.Sprintf("%s AND ", q.str)
@@ -60,7 +61,7 @@ func (q *QueryCondExpressHelper) GT(key string, value interface{}) *QueryCondExp
 		return nil
 	}
 
-	valueExp := fmt.Sprintf(":v_%s", key)
+	valueExp := fmt.Sprintf(":v_%s", q.removeSharp(key))
 	q.valueMap[valueExp] = att
 	if q.str != "" {
 		q.str = fmt.Sprintf("%s AND ", q.str)
@@ -75,7 +76,7 @@ func (q *QueryCondExpressHelper) GE(key string, value interface{}) *QueryCondExp
 	if err != nil {
 		return nil
 	}
-	valueExp := fmt.Sprintf(":v_%s", key)
+	valueExp := fmt.Sprintf(":v_%s", q.removeSharp(key))
 	q.valueMap[valueExp] = att
 	if q.str != "" {
 		q.str = fmt.Sprintf("%s AND ", q.str)
@@ -89,7 +90,7 @@ func (q *QueryCondExpressHelper) LE(key string, value interface{}) *QueryCondExp
 	if err != nil {
 		return nil
 	}
-	valueExp := fmt.Sprintf(":v_%s", key)
+	valueExp := fmt.Sprintf(":v_%s", q.removeSharp(key))
 	q.valueMap[valueExp] = att
 	if q.str != "" {
 		q.str = fmt.Sprintf("%s AND ", q.str)
@@ -105,7 +106,7 @@ func (q *QueryCondExpressHelper) BeginWith(key string, value interface{}) *Query
 		return nil
 	}
 
-	valueExp := fmt.Sprintf(":v_%s", key)
+	valueExp := fmt.Sprintf(":v_%s", q.removeSharp(key))
 	q.valueMap[valueExp] = att
 	if q.str != "" {
 		q.str = fmt.Sprintf("%s AND ", q.str)
@@ -120,14 +121,14 @@ func (q *QueryCondExpressHelper) Between(key string, left, right interface{}) *Q
 	if errLeft != nil {
 		return nil
 	}
-	valueExpLeft := fmt.Sprintf(":v_l_%s", key)
+	valueExpLeft := fmt.Sprintf(":v_l_%s", q.removeSharp(key))
 	q.valueMap[valueExpLeft] = attLeft
 
 	attRight, errRight := encodeToQueryAtt(right)
 	if errRight != nil {
 		return nil
 	}
-	valueExpRight := fmt.Sprintf(":v_r_%s", key)
+	valueExpRight := fmt.Sprintf(":v_r_%s", q.removeSharp(key))
 	q.valueMap[valueExpRight] = attRight
 
 	if q.str != "" {
@@ -137,4 +138,8 @@ func (q *QueryCondExpressHelper) Between(key string, left, right interface{}) *Q
 	q.str = fmt.Sprintf("%s%s BETWEEN :%s AND :%s", q.str, key, valueExpLeft, valueExpRight)
 
 	return q
+}
+
+func (q *QueryCondExpressHelper) removeSharp(key string) string {
+	return strings.Replace(key, "#", "", -1)
 }

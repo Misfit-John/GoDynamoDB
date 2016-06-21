@@ -30,7 +30,10 @@ func (e *GetItemExecutor) Exec() error {
 	if err != nil {
 		return NewDynError(resp.String())
 	}
-	decode(resp.Item, e.ret)
+	decodeErr := decode(resp.Item, e.ret)
+	if nil != decodeErr {
+		return decodeErr
+	}
 	return nil
 
 }

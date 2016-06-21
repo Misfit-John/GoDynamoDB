@@ -26,4 +26,25 @@ func Test_QueryCondHelper(t *testing.T) {
 		}
 	}
 
+	LtHelper := NewQueryCondExpress().Eq("id", "123").LT("index", 11)
+	if LtHelper.str != "id = :v_id AND index < :v_index" {
+		t.Errorf("wrong str:%s", LtHelper.str)
+	}
+
+	if v, ok := LtHelper.valueMap[":v_id"]; ok == false {
+		t.Error("no v_id")
+	} else {
+		if *v.S != "123" {
+			t.Errorf("wrong v_id:", *v.S)
+		}
+	}
+
+	if v, ok := LtHelper.valueMap[":v_index"]; ok == false {
+		t.Error("no v_index")
+	} else {
+		if *v.N != "11" {
+			t.Errorf("wrong v_index:", *v.N)
+		}
+	}
+
 }

@@ -1,6 +1,7 @@
 package GoDynamoDB
 
 import "github.com/aws/aws-sdk-go/service/dynamodb"
+import "github.com/aws/aws-sdk-go/aws"
 import "fmt"
 
 type QueryCondExpressHelper struct {
@@ -16,8 +17,11 @@ func NewQueryCondExpress() *QueryCondExpressHelper {
 	}
 }
 
-func (q *QueryCondExpressHelper) WithExpressMap(nameMap map[string]*string) *QueryCondExpressHelper {
-	q.expressMap = nameMap
+func (q *QueryCondExpressHelper) AddExpressMap(org, exp string) *QueryCondExpressHelper {
+	if nil == q.expressMap {
+		q.expressMap = make(map[string]*string)
+	}
+	q.expressMap[exp] = aws.String(org)
 	return q
 }
 

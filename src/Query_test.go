@@ -22,4 +22,7 @@ func Test_Query(t *testing.T) {
 			t.Error("wrong id")
 		}
 	}
+	if len(ret) != 2 {
+		t.Error("wrong ret num")
+	}
 }

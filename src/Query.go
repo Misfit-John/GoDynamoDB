@@ -8,12 +8,14 @@ type QueryExecutor struct {
 	db        *dynamodb.DynamoDB
 	prototype *ReadModel
 	ret       []ReadModel
+	count     int64
 }
 
 func (db GoDynamoDB) GetQueryExecutor(i ReadModel) (*QueryExecutor, error) {
 	ret := &QueryExecutor{
 		db:        db.db,
 		prototype: &i,
+		count:     0,
 	}
 	input := &dynamodb.QueryInput{
 		TableName: aws.String(i.GetTableName()),
@@ -49,9 +51,14 @@ func (q *QueryExecutor) Exec() error {
 		}
 		q.ret = append(q.ret, orgPrototype)
 	}
+	q.count = *resp.Count
 	return nil
 }
 
 func (q *QueryExecutor) GetRet() []ReadModel {
 	return q.ret
+}
+
+func (q *QueryExecutor) GetCount() int64 {
+	return q.count
 }

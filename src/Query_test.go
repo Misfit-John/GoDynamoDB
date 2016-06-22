@@ -5,12 +5,20 @@ import (
 )
 
 func Test_Query(t *testing.T) {
-	helper := NewQueryCondExpress().Eq("id", "123").GT("#a", 11).AddExpressMap("index", "#a")
+	helper1 := Eq("id", ":v_id")
+	helper2 := GT("#a", ":v_index")
+	helper := And(helper1, helper2).AddExpressMap("index", "#a")
+
 	exec, createErr := GetDBInstance().GetQueryExecutor(&QueryTest{})
 	if createErr != nil {
 		t.Error(createErr.Error())
 	}
-	err := exec.WithKeyCondition(*helper).Exec()
+
+	if helper.str != "id = :v_id AND #a > :v_index" {
+		t.Errorf("wrong condition,", helper.str)
+	}
+
+	err := exec.WithKeyCondition(helper).AddValue(":v_id", "123").AddValue(":v_index", 11).Exec()
 	if nil != err {
 		t.Error(err.Error())
 	}

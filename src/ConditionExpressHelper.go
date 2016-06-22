@@ -1,100 +1,137 @@
 package GoDynamoDB
 
-import "github.com/aws/aws-sdk-go/service/dynamodb"
 import "github.com/aws/aws-sdk-go/aws"
 import "strings"
 import "fmt"
 
+//any query helper should be cached after it's created
 type QueryCondExpressHelper struct {
 	str        string
-	valueMap   map[string]*dynamodb.AttributeValue
 	expressMap map[string]*string
 }
 
-const (
-	OperandConst  = 1
-	OperandTop    = 2
-	OperandNested = 3
-)
-
-type Operand struct {
-	value  interface{}
-	opType int
-}
-
+//won't gusee place holder for it, just create a query with place holer, I think that's more effective for a Server side program
 func NewQueryCondExpress() *QueryCondExpressHelper {
 	return &QueryCondExpressHelper{
-		str:      "",
-		valueMap: make(map[string]*dynamodb.AttributeValue),
+		str: "",
 	}
 }
 
-func (q *QueryCondExpressHelper) Eq(l, r Operand) *QueryCondExpressHelper {
-
-}
-func (q *QueryCondExpressHelper) NE(l, r Operand) *QueryCondExpressHelper {
-
-}
-
-func (q *QueryCondExpressHelper) LT(l, r Operand) *QueryCondExpressHelper {
-
+func (q *QueryCondExpressHelper) AddExpressMap(originalKey, placeHolder string) *QueryCondExpressHelper {
+	if nil == q.expressMap {
+		q.expressMap = make(map[string]*string)
+	}
+	q.expressMap[placeHolder] = aws.String(originalKey)
+	return q
 }
 
-func (q *QueryCondExpressHelper) LE(l, r Operand) *QueryCondExpressHelper {
+func Eq(l, r string) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("%s = %s", l, r)
+	return q
+}
+
+func NE(l, r string) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("%s <> %s", l, r)
+	return q
+}
+
+func LT(l, r string) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("%s < %s", l, r)
+	return q
+}
+
+func LE(l, r string) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("%s <= %s", l, r)
+	return q
+}
+
+func GT(l, r string) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("%s > %s", l, r)
+	return q
+}
+
+func GE(l, r string) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("%s >= %s", l, r)
+	return q
+}
+
+func In(l string, r ...string) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("%s IN (%s)", l, strings.Join(r, ","))
+	return q
+}
+
+func Between(l, rl, rr string) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("%s BETWEEN %s AND %s", l, rl, rr)
+	return q
+}
+
+func Attribute_exist(path string) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("attribute_exist(%s)", path)
+	return q
+}
+
+func Attribute_not_exist(path string) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("attribute_not_exist(%s)", path)
+	return q
+}
+
+func Attribute_type(path, t string) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("attribute_type(%s, %s)", path, t)
+	return q
 
 }
 
-func (q *QueryCondExpressHelper) GT(l, r Operand) *QueryCondExpressHelper {
+func Begins_with(path, prefix string) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("begins_with(%s, %s)", path, prefix)
+	return q
 
 }
 
-func (q *QueryCondExpressHelper) GE(l, r Operand) *QueryCondExpressHelper {
+func Contains(path, op string) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("contains(%s, %s)", path, op)
+	return q
 
 }
 
-func (q *QueryCondExpressHelper) In(l, r ...Operand) *QueryCondExpressHelper {
-
+func Size(path string) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("size(%s)", path)
+	return q
 }
 
-func (q *QueryCondExpressHelper) Between(l, rl, rr Operand) *QueryCondExpressHelper {
-
+func And(l, r *QueryCondExpressHelper) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("%s AND %s", l.str, r.str)
+	return q
 }
 
-func (q *QueryCondExpressHelper) Attribute_exist(path string) *QueryCondExpressHelper {
-
+func Or(l, r *QueryCondExpressHelper) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("%s OR %s", l.str, r.str)
+	return q
 }
 
-func (q *QueryCondExpressHelper) Attribute_not_exist(path string) *QueryCondExpressHelper {
-
+func Not(l *QueryCondExpressHelper) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("NOT %s", l.str)
+	return q
 }
 
-func (q *QueryCondExpressHelper) Attribute_type(path, t string) *QueryCondExpressHelper {
-
-}
-
-func (q *QueryCondExpressHelper) Begins_with(path, prefix string) *QueryCondExpressHelper {
-
-}
-func (q *QueryCondExpressHelper) Conatins(path, str string) *QueryCondExpressHelper {
-
-}
-func (q *QueryCondExpressHelper) Size(path string) *QueryCondExpressHelper {
-
-}
-
-func (q *QueryCondExpressHelper) And(l, r *QueryCondExpressHelper) *QueryCondExpressHelper {
-
-}
-
-func (q *QueryCondExpressHelper) Or(l, r *QueryCondExpressHelper) *QueryCondExpressHelper {
-
-}
-func (q *QueryCondExpressHelper) Not(q *QueryCondExpressHelper) *QueryCondExpressHelper {
-
-}
-func (q *QueryCondExpressHelper) Wrap(l, r *QueryCondExpressHelper) *QueryCondExpressHelper {
-
-}
-func (q *QueryCondExpressHelper) removeSharp(key string) string {
-	return strings.Replace(key, "#", "", -1)
+func Wrap(l *QueryCondExpressHelper) *QueryCondExpressHelper {
+	q := &QueryCondExpressHelper{}
+	q.str = fmt.Sprintf("(%s)", l.str)
+	return q
 }

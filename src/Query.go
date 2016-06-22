@@ -25,8 +25,19 @@ func (db GoDynamoDB) GetQueryExecutor(i ReadModel) (*QueryExecutor, error) {
 	return ret, nil
 }
 
-func (q *QueryExecutor) WithKeyCondition(helper QueryCondExpressHelper) *QueryExecutor {
-	q.input.ExpressionAttributeValues = helper.valueMap
+func (q *QueryExecutor) AddValue(express string, v interface{}) *QueryExecutor {
+	if nil == q.input.ExpressionAttributeValues {
+		q.input.ExpressionAttributeValues = make(map[string]*dynamodb.AttributeValue)
+	}
+	att, err := encodeToQueryAtt(v)
+	if err != nil {
+		return nil
+	}
+	q.input.ExpressionAttributeValues[express] = att
+	return q
+}
+
+func (q *QueryExecutor) WithKeyCondition(helper *QueryCondExpressHelper) *QueryExecutor {
 	q.input.ExpressionAttributeNames = helper.expressMap
 	q.input.KeyConditionExpression = aws.String(helper.str)
 	return q

@@ -17,7 +17,6 @@ func encodeToQueryAtt(i interface{}) (*dynamodb.AttributeValue, error) {
 	}
 
 	return encodeToAtt(v)
-
 }
 
 func encodeToAtt(v reflect.Value) (*dynamodb.AttributeValue, error) {

@@ -38,7 +38,12 @@ func (q *QueryExecutor) AddValue(express string, v interface{}) *QueryExecutor {
 }
 
 func (q *QueryExecutor) WithKeyCondition(helper *QueryCondExpressHelper) *QueryExecutor {
-	q.input.ExpressionAttributeNames = helper.expressMap
+	if nil == q.input.ExpressionAttributeNames {
+		q.input.ExpressionAttributeNames = make(map[string]*string)
+	}
+	for key, value := range helper.expressMap {
+		q.input.ExpressionAttributeNames[key] = value
+	}
 	q.input.KeyConditionExpression = aws.String(helper.str)
 	return q
 }

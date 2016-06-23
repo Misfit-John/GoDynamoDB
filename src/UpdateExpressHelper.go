@@ -60,3 +60,31 @@ func DeleteFromSet(toDelete ...SetValueMap) *UpdateCondExpressHelper {
 		str: str,
 	}
 }
+
+func SetValue(toSet ...SetValueMap) *UpdateCondExpressHelper {
+	nameMapList := make([]string, len(toSet))
+	for i := 0; i < len(toSet); i++ {
+		nameMapList[i] = fmt.Sprintf("%s %s", toSet[i].SetName, toSet[i].SetValue)
+	}
+	str := fmt.Sprint("SET %s", strings.Join(nameMapList, ","))
+
+	return &UpdateCondExpressHelper{
+		str: str,
+	}
+}
+
+func Update_if_not_exists(toUpdate SetValueMap) string {
+	return fmt.Sprintf("if_notexists(%s, %s)", toUpdate.SetName, toUpdate.SetValue)
+}
+
+func Update_list_append(toAppend SetValueMap) string {
+	return fmt.Sprintf("list_append(%s, %s)", toAppend.SetName, toAppend.SetValue)
+}
+
+func UpdatePlusValue(l, r string) string {
+	return fmt.Sprintf("%s + %s", l, r)
+}
+
+func UpdateMinusValue(l, r string) string {
+	return fmt.Sprintf("%s - %s", l, r)
+}

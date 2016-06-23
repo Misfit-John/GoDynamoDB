@@ -42,7 +42,7 @@ func AddToField(toAdd ...SetValueMap) *UpdateCondExpressHelper {
 	for i := 0; i < len(toAdd); i++ {
 		nameMapList[i] = fmt.Sprintf("%s %s", toAdd[i].SetName, toAdd[i].SetValue)
 	}
-	str := fmt.Sprint("Add %s", strings.Join(nameMapList, ","))
+	str := fmt.Sprintf("Add %s", strings.Join(nameMapList, ","))
 
 	return &UpdateCondExpressHelper{
 		str: str,
@@ -54,7 +54,7 @@ func DeleteFromSet(toDelete ...SetValueMap) *UpdateCondExpressHelper {
 	for i := 0; i < len(toDelete); i++ {
 		nameMapList[i] = fmt.Sprintf("%s %s", toDelete[i].SetName, toDelete[i].SetValue)
 	}
-	str := fmt.Sprint("DELETE %s", strings.Join(nameMapList, ","))
+	str := fmt.Sprintf("DELETE %s", strings.Join(nameMapList, ","))
 
 	return &UpdateCondExpressHelper{
 		str: str,
@@ -64,9 +64,9 @@ func DeleteFromSet(toDelete ...SetValueMap) *UpdateCondExpressHelper {
 func SetValue(toSet ...SetValueMap) *UpdateCondExpressHelper {
 	nameMapList := make([]string, len(toSet))
 	for i := 0; i < len(toSet); i++ {
-		nameMapList[i] = fmt.Sprintf("%s %s", toSet[i].SetName, toSet[i].SetValue)
+		nameMapList[i] = fmt.Sprintf("%s = %s", toSet[i].SetName, toSet[i].SetValue)
 	}
-	str := fmt.Sprint("SET %s", strings.Join(nameMapList, ","))
+	str := fmt.Sprintf("SET %s", strings.Join(nameMapList, ","))
 
 	return &UpdateCondExpressHelper{
 		str: str,

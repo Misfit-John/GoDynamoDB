@@ -16,7 +16,6 @@ befor_script:
   - java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
 
 script:
-  - ls
   - godep restore
   - go test ./... -v -covermode=count -coverprofile=coverage.out
 

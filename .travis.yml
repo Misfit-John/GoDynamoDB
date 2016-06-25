@@ -1,0 +1,22 @@
+language: go
+
+go:
+  - 1.6
+  - tip
+
+install: make get-deps
+
+install:
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/mattn/goveralls
+  - wget http://dynamodb-local.s3-website-us-west-2.amazonaws.com/dynamodb_local_2016-05-17.zip
+  - unzip dynamodb_local_2016-05-17.zip
+
+befor_script:
+  - cd dynamodb_local_2016-05-17 && java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb & cd -
+
+script:
+  - go test -v -covermode=count -coverprofile=coverage.out
+
+after_success:
+  - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN

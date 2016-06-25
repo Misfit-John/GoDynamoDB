@@ -62,6 +62,7 @@ func initCache(t reflect.Type) (*FieldCache, error) {
 					return nil, NewDynError(fmt.Sprintf("double defined partition key: %s", fieldI.Name))
 				} else {
 					pair.pkey = fieldI.Name
+					out.key[keyTag] = pair
 				}
 			} else {
 				out.key[keyTag] = KeyPair{pkey: fieldI.Name}
@@ -74,7 +75,8 @@ func initCache(t reflect.Type) (*FieldCache, error) {
 				if pair.rkey != "" {
 					return nil, NewDynError(fmt.Sprintf("double defined range key: %s, range tag:%s, already have range key:%s", fieldI.Name, rangeTag, pair.rkey))
 				} else {
-					pair.pkey = fieldI.Name
+					pair.rkey = fieldI.Name
+					out.key[rangeTag] = pair
 				}
 			} else {
 				out.key[rangeTag] = KeyPair{rkey: fieldI.Name}

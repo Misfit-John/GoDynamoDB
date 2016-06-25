@@ -6,6 +6,7 @@ import "github.com/aws/aws-sdk-go/aws"
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 type CreateTableExecutor struct {
@@ -70,6 +71,15 @@ func (d GoDynamoDB) GetCreateTableExecutor(i CreateCollectionModel) (*CreateTabl
 				}
 				ret.insertAtt(t, rkeyIndex)
 			}
+			throughPut, exist := i.GetPrevision()[key]
+			if !exist {
+				return nil, NewDynError("no through put for table is provided")
+			}
+			input.ProvisionedThroughput = &dynamodb.ProvisionedThroughput{
+				ReadCapacityUnits:  aws.Int64(throughPut.read),
+				WriteCapacityUnits: aws.Int64(throughPut.write),
+			}
+
 		} else {
 			//this is an index key
 			if "" == pKeyName && "" != rKeyName {
@@ -78,21 +88,18 @@ func (d GoDynamoDB) GetCreateTableExecutor(i CreateCollectionModel) (*CreateTabl
 					IndexName: aws.String(key),
 				}
 				tablePartKey, _ := cache.key[tableName]
-				pkeyIndex, pExist := cache.fieldIndex[tablePartKey.pkey]
-				if !pExist {
-					return nil, NewDynError("no part key exist")
-				}
 				localIndex.KeySchema = make([]*dynamodb.KeySchemaElement, 1)
 
+				keyAlis, aliasExist := cache.fieldNameMap[tablePartKey.pkey]
+				if !aliasExist {
+					keyAlis = tablePartKey.pkey
+				}
+
 				hashKeySchema := &dynamodb.KeySchemaElement{
-					AttributeName: aws.String(pKeyName),
+					AttributeName: aws.String(keyAlis),
 					KeyType:       aws.String(dynamodb.KeyTypeHash),
 				}
 				localIndex.KeySchema[0] = hashKeySchema
-				if !pExist {
-					return nil, NewDynError("no partition key")
-				}
-				ret.insertAtt(t, pkeyIndex)
 
 				rangeKeySchema := &dynamodb.KeySchemaElement{
 					AttributeName: aws.String(rKeyName),
@@ -108,6 +115,22 @@ func (d GoDynamoDB) GetCreateTableExecutor(i CreateCollectionModel) (*CreateTabl
 				if nil == input.LocalSecondaryIndexes {
 					input.LocalSecondaryIndexes = make([]*dynamodb.LocalSecondaryIndex, 0)
 				}
+
+				iprojection, ok := i.GetProjection()[key]
+				if !ok {
+					return nil, NewDynError("no projection defination for index")
+				}
+				projection := &dynamodb.Projection{
+					ProjectionType: aws.String(iprojection.projectType),
+				}
+				if ProjectDefined == iprojection.projectType {
+					fieldList := strings.Split(iprojection.projectFields, ",")
+					projection.NonKeyAttributes = make([]*string, len(fieldList))
+					for i, value := range fieldList {
+						projection.NonKeyAttributes[i] = aws.String(value)
+					}
+				}
+				localIndex.Projection = projection
 				input.LocalSecondaryIndexes = append(input.LocalSecondaryIndexes, localIndex)
 
 			} else {
@@ -140,9 +163,32 @@ func (d GoDynamoDB) GetCreateTableExecutor(i CreateCollectionModel) (*CreateTabl
 					}
 					ret.insertAtt(t, rkeyIndex)
 				}
+				throughPut, exist := i.GetPrevision()[key]
+				if !exist {
+					return nil, NewDynError("no through put for local index is provided")
+				}
+				globalIndex.ProvisionedThroughput = &dynamodb.ProvisionedThroughput{
+					ReadCapacityUnits:  aws.Int64(throughPut.read),
+					WriteCapacityUnits: aws.Int64(throughPut.write),
+				}
 				if nil == input.GlobalSecondaryIndexes {
 					input.GlobalSecondaryIndexes = make([]*dynamodb.GlobalSecondaryIndex, 0)
 				}
+				iprojection, ok := i.GetProjection()[key]
+				if !ok {
+					return nil, NewDynError("no projection defination for index")
+				}
+				projection := &dynamodb.Projection{
+					ProjectionType: aws.String(iprojection.projectType),
+				}
+				if ProjectDefined == iprojection.projectType {
+					fieldList := strings.Split(iprojection.projectFields, ",")
+					projection.NonKeyAttributes = make([]*string, len(fieldList))
+					for i, value := range fieldList {
+						projection.NonKeyAttributes[i] = aws.String(value)
+					}
+				}
+				globalIndex.Projection = projection
 				input.GlobalSecondaryIndexes = append(input.GlobalSecondaryIndexes, globalIndex)
 			}
 		}
@@ -153,6 +199,11 @@ func (d GoDynamoDB) GetCreateTableExecutor(i CreateCollectionModel) (*CreateTabl
 func (e *CreateTableExecutor) insertAtt(t reflect.Type, index int) error {
 	fieldDef := t.Field(index)
 	name := fieldDef.Name
+	aliaTag := fieldDef.Tag.Get("DAlias")
+	if "" != aliaTag {
+		name = aliaTag
+	}
+
 	field := fieldDef.Type
 	for field.Kind() == reflect.Ptr {
 		field = field.Elem()

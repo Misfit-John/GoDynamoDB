@@ -11,6 +11,7 @@ func Test_CreateTable(t *testing.T) {
 	}
 	Eerr := exe.Exec()
 	if nil != Eerr {
+		t.Logf(exe.input.GoString())
 		t.Error(Eerr.Error())
 	}
 }

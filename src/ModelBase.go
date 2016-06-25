@@ -12,7 +12,7 @@ const (
 	WriteProvisionedThroughput = 0
 	ReadProvisionedThroughput  = 1
 	ProjectAll                 = "ALL"
-	ProjectKey                 = "KEY_ONLY"
+	ProjectKey                 = "KEYS_ONLY"
 	ProjectDefined             = "INCLUDE"
 )
 
@@ -32,10 +32,10 @@ func NewProjectionDefination(projectType, fields string) ProjectionDefination {
 }
 
 func NewThroughput(read, write int64) Throughput {
-	if read == 0 {
+	if read <= 0 {
 		read = 1
 	}
-	if write == 0 {
+	if write <= 0 {
 		write = 1
 	}
 	return Throughput{read: read, write: write}
@@ -43,6 +43,7 @@ func NewThroughput(read, write int64) Throughput {
 
 type CreateCollectionModel interface {
 	GetTableName() string
+	//provide only table throughput and global index throughput
 	GetPrevision() map[string]Throughput
 	GetProjection() map[string]ProjectionDefination
 }

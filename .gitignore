@@ -24,3 +24,4 @@ _testmain.go
 *.prof
 GoDynamoDB
 Session.vim
+coverage.out

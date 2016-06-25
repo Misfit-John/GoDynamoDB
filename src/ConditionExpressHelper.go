@@ -10,13 +10,6 @@ type QueryCondExpressHelper struct {
 	expressMap map[string]*string
 }
 
-//won't gusee place holder for it, just create a query with place holer, I think that's more effective for a Server side program
-func NewQueryCondExpress() *QueryCondExpressHelper {
-	return &QueryCondExpressHelper{
-		str: "",
-	}
-}
-
 func (q *QueryCondExpressHelper) AddExpressMap(originalKey, placeHolder string) *QueryCondExpressHelper {
 	if nil == q.expressMap {
 		q.expressMap = make(map[string]*string)
@@ -134,4 +127,8 @@ func Wrap(l *QueryCondExpressHelper) *QueryCondExpressHelper {
 	q := &QueryCondExpressHelper{}
 	q.str = fmt.Sprintf("(%s)", l.str)
 	return q
+}
+
+func (q *QueryCondExpressHelper) String() string {
+	return q.str
 }

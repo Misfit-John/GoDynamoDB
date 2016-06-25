@@ -33,5 +33,5 @@ Some of the encoder and decoder codes is copied from github.com/justonia/dynamod
 - Will sleep 100ms or more if the request for BatchGetItem is too large to return in one time.
 - Don't allow duplicate keys in batch get request because the limit of AWS SDK
 - This ORM won't handle expression name map for you automatically because I don't sure what do you mean by `table.second.thrid` . Is it a field named `table.second.thrid` or a path to embedded JSON document?
-
+- If the partition key is appear , then we think this is a global index, otherwise we think it is a local index
 

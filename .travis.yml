@@ -2,21 +2,22 @@ language: go
 
 go:
   - 1.6
-  - tip
 
 install: make get-deps
 
 install:
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/mattn/goveralls
+  - go get github.com/tools/godep
   - wget http://dynamodb-local.s3-website-us-west-2.amazonaws.com/dynamodb_local_2016-05-17.zip
   - unzip dynamodb_local_2016-05-17.zip
 
 befor_script:
-  - cd dynamodb_local_2016-05-17 && java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb & cd -
+  - java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
 
 script:
   - ls
+  - godep restore
   - go test ./... -v -covermode=count -coverprofile=coverage.out
 
 after_success:

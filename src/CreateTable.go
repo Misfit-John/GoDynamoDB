@@ -13,8 +13,11 @@ type CreateTableExecutor struct {
 	db    *dynamodb.DynamoDB
 }
 
-func (d GoDynamoDB) GetCreateTableExecutor(i ReadModel) (*CreateTableExecutor, error) {
+func (d GoDynamoDB) GetCreateTableExecutor(i CreateCollectionModel) (*CreateTableExecutor, error) {
 	t := reflect.TypeOf(i)
+	for t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
 	cache, cacheError := getCache(t)
 	if cacheError != nil {
 		return nil, cacheError
@@ -188,4 +191,12 @@ func (e *CreateTableExecutor) Exec() error {
 		return err
 	}
 	return nil
+}
+
+func (db GoDynamoDB) DeleteTable(i ReadModel) error {
+	input := &dynamodb.DeleteTableInput{
+		TableName: aws.String(i.GetTableName()),
+	}
+	_, err := db.db.DeleteTable(input)
+	return err
 }

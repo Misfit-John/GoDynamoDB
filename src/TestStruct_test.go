@@ -27,3 +27,30 @@ type QueryTest struct {
 func (*QueryTest) GetTableName() string {
 	return "query_test"
 }
+
+type CreateTest struct {
+	Id     string `DAlias:"id" DPKey:"create_test"`
+	Rang   int    `DAlias:"trange" DRKey:"create_test"`
+	LRange int    `DAlias:"LRange" DRKey:"lindex"`
+	Pid    string `DPKey:"gindex"`
+	Prange string `DRKey:"gindex"`
+}
+
+func (*CreateTest) GetTableName() string {
+	return "create_test"
+}
+
+func (*CreateTest) GetPrevision() map[string]Throughput {
+	return map[string]Throughput{
+		"create_test": NewThroughput(1, 1),
+		"lindex":      NewThroughput(1, 1),
+		"gindex":      NewThroughput(1, 1),
+	}
+}
+
+func (*CreateTest) GetProjection() map[string]ProjectionDefination {
+	return map[string]ProjectionDefination{
+		"lindex": NewProjectionDefination(ProjectKey, ""),
+		"gindex": NewProjectionDefination(ProjectKey, ""),
+	}
+}

@@ -35,3 +35,6 @@ Some of the encoder and decoder codes is copied from github.com/justonia/dynamod
 - This ORM won't handle expression name map for you automatically because I don't sure what do you mean by `table.second.thrid` . Is it a field named `table.second.thrid` or a path to embedded JSON document?
 - If the partition key is appear , then we think this is a global index, otherwise we think it is a local index
 
+## update log
+- 2016/06/25 `0.0.1-Alpha` released !Almost all frequently use APIs are all implemented. This package can work now. I will add more test case on it so it won't get problem
+

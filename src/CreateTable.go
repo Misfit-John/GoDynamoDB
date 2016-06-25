@@ -14,6 +14,7 @@ type CreateTableExecutor struct {
 	db    *dynamodb.DynamoDB
 }
 
+//need to refactor to a more clear func
 func (d GoDynamoDB) GetCreateTableExecutor(i CreateCollectionModel) (*CreateTableExecutor, error) {
 	t := reflect.TypeOf(i)
 	for t.Kind() == reflect.Ptr {

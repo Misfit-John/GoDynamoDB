@@ -11,7 +11,11 @@ func Test_CreateTable(t *testing.T) {
 	}
 	Eerr := exe.Exec()
 	if nil != Eerr {
-		t.Logf(exe.input.GoString())
 		t.Error(Eerr.Error())
 	}
+	deleteErr := GetDBInstance().DeleteTable(&CreateTest{})
+	if nil != deleteErr {
+		t.Error(deleteErr.Error())
+	}
+
 }

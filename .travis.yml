@@ -14,7 +14,7 @@ install:
 
 
 script:
-  - java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
+  - java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb&
   - godep restore
   - go test ./... -v -covermode=count -coverprofile=coverage.out
 

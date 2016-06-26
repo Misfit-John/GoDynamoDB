@@ -12,10 +12,9 @@ install:
   - wget http://dynamodb-local.s3-website-us-west-2.amazonaws.com/dynamodb_local_2016-05-17.zip
   - unzip dynamodb_local_2016-05-17.zip
 
-befor_script:
-  - java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
 
 script:
+  - java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
   - godep restore
   - go test ./... -v -covermode=count -coverprofile=coverage.out
 

@@ -44,7 +44,7 @@ func init() {
 
 	exe2, _ := GetDBInstance().GetCreateTableExecutor(&TestStruct2nd{})
 	exe2.Exec()
-	insertT2nd1, _ := GetDBInstance().GetPutItemExcutor(&TestStruct2nd{Id: "1235", Name: "2ndJohn", School: "UESTC"})
+	insertT2nd1, _ := GetDBInstance().GetPutItemExcutor(&TestStruct2nd{Id: "1234", Name: "2ndJohn", School: "UESTC"})
 	insertT2nd1.Exec()
 
 	exe3, _ := GetDBInstance().GetCreateTableExecutor(&QueryTest{})

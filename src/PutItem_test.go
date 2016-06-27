@@ -34,4 +34,10 @@ func Test_BatchPutItem(t *testing.T) {
 
 func init() {
 	InitLocalDBInstance("http://127.0.0.1:8000")
+	exe1, _ := GetDBInstance().GetCreateTableExecutor(&TestStruct{})
+	exe1.Exec()
+	exe2, _ := GetDBInstance().GetCreateTableExecutor(&TestStruct2nd{})
+	exe2.Exec()
+	exe3, _ := GetDBInstance().GetCreateTableExecutor(&QueryTest{})
+	exe3.Exec()
 }
